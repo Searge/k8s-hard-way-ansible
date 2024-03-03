@@ -1,0 +1,11 @@
+.idea
+.vagrant
+temp
+*.crt
+*.key
+*.pem
+*.csr
+*csr.json
+*.kubeconfig
+quick-steps
+.venv

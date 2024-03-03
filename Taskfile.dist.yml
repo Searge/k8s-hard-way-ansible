@@ -1,0 +1,117 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+# https://taskfile.dev
+
+version: "3"
+
+env:
+  ANSIBLE_CONFIG: "{{.USER_WORKING_DIR}}/ansible.cfg"
+  ANSIBLE_LINT_CONFIG: "{{.USER_WORKING_DIR}}/.config/ansible-lint.yml"
+  YAMLLINT_CONFIG_FILE: "{{.USER_WORKING_DIR}}/.config/yamllint.yml"
+
+dotenv: [".env.dist", ".env"]
+
+tasks:
+  default:
+    aliases: [play]
+    dir: "{{.USER_WORKING_DIR}}"
+    desc: "task play -- ansible/file.yml"
+    summary: |
+      Script for easy running playbooks
+
+      It takes all shell arguments, i.e., playbook location,
+      tags, env, and everything you'll pass it.
+    cmds:
+      - bash ./scripts/play {{.CLI_ARGS}}
+
+  provision:
+    dir: "{{.USER_WORKING_DIR}}"
+    desc: "task provision -- $ENVIRONMENT"
+    summary: |
+      Script for easy running provision
+
+      It takes all shell arguments, i.e., environment,
+      tags, and everything you'll pass it.
+    cmds:
+      - bash ./scripts/provision.sh {{.CLI_ARGS}}
+
+  install:
+    dir: "{{.USER_WORKING_DIR}}"
+    desc: "task install"
+    summary: |
+      Script for easy install all dependencies
+
+      It runs poetry install inside the pyenv shell.
+      The vesion of python is defined in the .python-version file.
+    cmds:
+      - poetry env use $(which python)
+      - poetry config virtualenvs.in-project true
+      - pyenv exec poetry install
+
+  lint:
+    desc: "task lint"
+    summary: |
+      Script for easy running ansible-lint and yamllint
+
+      It runs linters with default config on the ansible directory.
+    deps: [ansible-lint, yamllint]
+
+  ansible-lint:
+    dir: "{{.USER_WORKING_DIR}}/ansible"
+    cmds:
+      - poetry run ansible-lint -c $ANSIBLE_LINT_CONFIG .
+
+  yamllint:
+    dir: "{{.USER_WORKING_DIR}}/ansible"
+    cmds:
+      - poetry run yamllint -c $YAMLLINT_CONFIG_FILE .
+
+  # ======================================================================
+  # Vagrant tasks
+  # ======================================================================
+  start:
+    cmds:
+      - vagrant up --provider=virtualbox
+    desc: Start Virtualbox VM
+    summary: |
+      Script for easy running vagrant up
+
+      It runs vagrant up with default config on the ansible directory.
+      For Window machine you need change to:
+      - vagrant up --provider=hyperv
+
+  stop:
+    cmds:
+      - vagrant halt
+    desc: Stop Virtualbox VM
+
+  destroy:
+    cmds:
+      - vagrant destroy -f
+      - rm -rf .vagrant
+      - sed -i '/^jcdecaux.local/d' known_hosts
+    desc: Delete Virtualbox VM from disk
+
+  ssh:
+    cmds:
+      - vagrant ssh
+    desc: Start SSH session to Virtualbox VM
+
+  box:
+    cmds:
+      - vagrant box list
+    desc: List available Vagrant boxes
+
+  vagrant-prune:
+    cmds:
+      - vagrant global-status --prune
+    desc: Prune Vagrant global status
+
+  test-connectivity:
+    cmds:
+      - vagrant ssh -c "ping -c 1 jcdecaux.local"
+    desc: Test connectivity to Virtualbox VM
+
+  test-curl:
+    cmds:
+      - vagrant ssh -c "curl -I jcdecaux.local"
+    desc: Test curl to Virtualbox VM

@@ -1,0 +1,33 @@
+[tool.poetry]
+name = "k8s-hard-way-ansible"
+version = "0.1.0"
+description = "Provisioning of Kubernetes the hard way with Ansible"
+authors = ["DSI <dsi@smile.fr>"]
+license = "BSD 3-Clause"
+readme = "README.md"
+repository = "https://github.com/searge/k8s-hard-way-ansible.git"
+keywords = ["ansible", "provisioning", "kubernetes", "debian"]
+classifiers = [
+    "Operating System :: POSIX :: Linux",
+    "Intended Audience :: System Administrators",
+    "Framework :: Ansible",
+]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+ansible-core = "^2.15"
+ansible = "*"
+cryptography = "^41.0"
+passlib = "^1.7.4"
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.7.0"
+yamllint = "^1.32.0"
+ansible-lint = { version = "^6.17.0", markers = "platform_system != 'Windows'" }
+pre-commit = "^3.3.3"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+

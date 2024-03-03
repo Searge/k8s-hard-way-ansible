@@ -1,0 +1,48 @@
+﻿---
+vagrant:
+  children:
+    vagrant_front:
+      hosts:
+        jcdecaux.local:
+
+    webservers_vagrant:
+      children:
+        webservers_vagrant_main:
+          children:
+            vagrant_front:
+        webservers_vagrant_other:
+
+    dbservers_vagrant:
+      children:
+        vagrant_front:
+
+    searchservers_vagrant:
+      children:
+        vagrant_front:
+
+    cacheservers_vagrant:
+      children:
+        vagrant_front:
+
+webservers:
+  children:
+    webservers_vagrant:
+
+webservers_main:
+  children:
+    webservers_vagrant_main:
+webservers_others:
+  children:
+    webservers_vagrant_other:
+
+dbservers:
+  children:
+    dbservers_vagrant:
+
+searchservers:
+  children:
+    searchservers_vagrant:
+
+cacheservers:
+  children:
+    cacheservers_vagrant:
