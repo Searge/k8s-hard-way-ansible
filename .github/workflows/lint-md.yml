@@ -3,9 +3,9 @@ on:
   push:
     branches-ignore:
       - main
-    paths:
-      - "docs/**"
-      - "/README.md"
+    # paths:
+    #   - "docs/**"
+    #   - "/README.md"
 
 permissions:
   contents: read
@@ -23,6 +23,6 @@ jobs:
       - name: Perform lint with markdownlint-cli
         uses: nosborn/github-action-markdown-cli@v3.3.0
         with:
-          files: docs/
+          files: ./
           config_file: .markdownlint.yaml
           dot: false
