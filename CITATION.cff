@@ -1,0 +1,29 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: 'k8s the hard way with ansible '
+message: 'Provisioning of Kubernetes the hard way with Ansible '
+type: software
+authors:
+  - given-names: Sergij
+    family-names: Boremchuk
+    email: searge@duck.com
+repository-code: 'https://github.com/Searge/k8s-hard-way-ansible'
+repository: 'https://github.com/mmumshad/kubernetes-the-hard-way'
+abstract: >-
+  This repository contains an Ansible playbook to provision
+  a Kubernetes cluster the hard way.
+
+  The hard way is a manual way to provision a Kubernetes
+  cluster, as described by Kelsey Hightower in his
+  repository.
+keywords:
+  - ansible
+  - kubernetes
+  - debian
+  - vagrant
+license: BSD-3-Clause
+commit: 6e2e71f
+version: v0.0.1
+date-released: '2024-03-03'
