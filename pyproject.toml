@@ -18,8 +18,8 @@ keywords = ["ansible", "provisioning", "kubernetes", "debian"]
 requires-python = ">=3.10"
 dependencies = [
     "ansible",
-    "ansible-core>=2.15",
-    "cryptography>=41",
+    "ansible-core>=2.16",
+    "cryptography",
     "passlib>=1.7",
     "docker",
     "kubernetes",

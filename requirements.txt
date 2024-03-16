@@ -8,12 +8,12 @@ ansible-core==2.16.4
     #   ansible
     #   ansible-compat
     #   ansible-lint
-ansible-lint==24.2.0
+ansible-lint==24.2.1
 attrs==23.2.0
     # via
     #   jsonschema
     #   referencing
-black==24.2.0
+black==24.3.0
     # via ansible-lint
 bracex==2.4
     # via wcmatch
@@ -29,7 +29,7 @@ charset-normalizer==3.3.2
     # via requests
 click==8.1.7
     # via black
-cryptography==41.0.7
+cryptography==42.0.5
     # via ansible-core
 docker==7.0.0
 filelock==3.13.1
@@ -59,7 +59,7 @@ oauthlib==3.2.2
     # via
     #   kubernetes
     #   requests-oauthlib
-packaging==23.2
+packaging==24.0
     # via
     #   ansible-compat
     #   ansible-core
@@ -93,7 +93,7 @@ pyyaml==6.0.1
     #   ansible-lint
     #   kubernetes
     #   yamllint
-referencing==0.33.0
+referencing==0.34.0
     # via
     #   jsonschema
     #   jsonschema-specifications
@@ -118,7 +118,7 @@ ruamel-yaml==0.18.6
     # via ansible-lint
 ruamel-yaml-clib==0.2.8
     # via ruamel-yaml
-ruff==0.3.2
+ruff==0.3.3
 six==1.16.0
     # via
     #   kubernetes
