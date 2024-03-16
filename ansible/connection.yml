@@ -1,0 +1,33 @@
+﻿---
+# tests connection with ansible user pointed in inventory file
+- name: Test connection to the webservers
+  hosts:
+    - all
+  gather_facts: false
+  tasks:
+    - name: Test connection
+      block:
+        - name: Ping the hosts
+          ansible.builtin.ping:
+          register: output
+          ignore_unreachable: true
+
+        - name: Print the output
+          when:
+            - output.ping is defined
+            - output.ping == 'pong'
+          ansible.builtin.debug:
+            var: output
+
+      always:
+        - name: Handle unreachable hosts
+          when: output.unreachable is true
+          block:
+            - name: Print the output of unreachable hosts
+              when: output.msg is defined
+              ansible.builtin.debug:
+                var: output.msg
+
+            - name: Fail the task
+              ansible.builtin.fail:
+                msg: "Host is unreachable"
