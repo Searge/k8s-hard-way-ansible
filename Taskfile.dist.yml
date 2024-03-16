@@ -21,34 +21,71 @@ tasks:
       It takes all shell arguments, i.e., playbook location,
       tags, env, and everything you'll pass it.
     cmds:
-      - bash ./scripts/play {{.CLI_ARGS}}
-
-  provision:
-    dir: "{{.USER_WORKING_DIR}}"
-    desc: "task provision -- $ENVIRONMENT"
-    summary: |
-      Script for easy running provision
-
-      It takes all shell arguments, i.e., environment,
-      tags, and everything you'll pass it.
-    cmds:
-      - bash ./scripts/provision.sh {{.CLI_ARGS}}
+      - bash ./scripts/play.sh {{.CLI_ARGS}}
 
   install:
     dir: "{{.USER_WORKING_DIR}}"
     desc: "task install"
     summary: |
-      Script for easy install all dependencies
+      Script for setup the virtual environment and install all dependencies
 
-      It runs poetry install inside the pyenv shell.
-      The vesion of python is defined in the .python-version file.
+      It utilizes uv to create a virtual environment, activate it
+      and install all dependencies from pyproject.toml.
     cmds:
-      - poetry env use $(which python)
-      - poetry config virtualenvs.in-project true
-      - pyenv exec poetry install
+      - uv venv -p $(cat .python-version)
+      - task: venv
+        vars:
+          content: |-
+                    uv pip install -r requirements.txt
+                    ansible-galaxy collection install -r requirements.yml
 
+  # ======================================================================
+  # Python tasks
+  # ======================================================================
+  pip-compile:
+    desc: "task pip-compile"
+    summary: |
+      Script for easy running pip-compile
+
+      It updates the requirements.txt file with the latest versions
+      of all packages and their dependencies from pyproject.toml.
+    cmds:
+      - task: venv
+        vars:
+          content: 'uv pip compile pyproject.toml -o requirements.txt'
+
+  pip-sync:
+    desc: "task pip-sync"
+    summary: |
+      Script for easy running pip-sync
+
+      It installs, upgrades, downgrades, and uninstalls packages to
+      match the requirements.txt file.
+    cmds:
+      - task: venv
+        vars:
+          content: 'uv pip sync requirements.txt'
+
+  venv:
+    desc: "task venv"
+    summary: |
+      Script for easy running commands in the virtual environment
+
+      It takes all shell arguments, i.e., environment,
+      tags, and everything you'll pass it.
+    silent: true
+    cmds:
+      - |-
+        bash << 'eof'
+        source .venv/bin/activate
+        {{.content}}
+        eof
+
+  # ======================================================================
+  # Ansible linting tasks
+  # ======================================================================
   lint:
-    desc: "task lint"
+    desc: "task lint -- ansible/playbook.yml"
     summary: |
       Script for easy running ansible-lint and yamllint
 
@@ -56,14 +93,16 @@ tasks:
     deps: [ansible-lint, yamllint]
 
   ansible-lint:
-    dir: "{{.USER_WORKING_DIR}}/ansible"
     cmds:
-      - poetry run ansible-lint -c $ANSIBLE_LINT_CONFIG .
+      - task: venv
+        vars:
+          content: ansible-lint -c $ANSIBLE_LINT_CONFIG {{.CLI_ARGS}}
 
   yamllint:
-    dir: "{{.USER_WORKING_DIR}}/ansible"
     cmds:
-      - poetry run yamllint -c $YAMLLINT_CONFIG_FILE .
+      - task: venv
+        vars:
+          content: yamllint -c $YAMLLINT_CONFIG_FILE {{.CLI_ARGS}}
 
   # ======================================================================
   # Vagrant tasks
