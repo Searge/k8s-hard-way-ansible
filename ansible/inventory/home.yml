@@ -1,0 +1,27 @@
+﻿---
+home:
+  children:
+    home_control:
+      hosts:
+        control-plane.local:
+    home_nodes:
+      hosts:
+        worker-node-01.local:
+        worker-node-02.local:
+
+kube_control_plane:
+  children:
+    home_control:
+
+etcd:
+  children:
+    home_control:
+
+kube_nodes:
+  children:
+    home_nodes:
+
+k8s_cluster:
+  children:
+    kube_control_plane:
+    kube_nodes:

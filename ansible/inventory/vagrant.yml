@@ -1,48 +1,28 @@
 ﻿---
 vagrant:
   children:
-    vagrant_front:
+    vagrant_control:
       hosts:
-        jcdecaux.local:
+        vagrant-plane01.local:
+        vagrant-plane02.local:
+    vagrant_nodes:
+      hosts:
+        vagrant-w01.local:
+        vagrant-w02.local:
 
-    webservers_vagrant:
-      children:
-        webservers_vagrant_main:
-          children:
-            vagrant_front:
-        webservers_vagrant_other:
-
-    dbservers_vagrant:
-      children:
-        vagrant_front:
-
-    searchservers_vagrant:
-      children:
-        vagrant_front:
-
-    cacheservers_vagrant:
-      children:
-        vagrant_front:
-
-webservers:
+kube_control_plane:
   children:
-    webservers_vagrant:
+    vagrant_control:
 
-webservers_main:
+etcd:
   children:
-    webservers_vagrant_main:
-webservers_others:
-  children:
-    webservers_vagrant_other:
+    vagrant_control:
 
-dbservers:
+kube_nodes:
   children:
-    dbservers_vagrant:
+    vagrant_nodes:
 
-searchservers:
+k8s_cluster:
   children:
-    searchservers_vagrant:
-
-cacheservers:
-  children:
-    cacheservers_vagrant:
+    kube_control_plane:
+    kube_nodes:
