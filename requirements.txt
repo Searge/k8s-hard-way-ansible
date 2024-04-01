@@ -102,7 +102,7 @@ requests==2.31.0
     #   docker
     #   kubernetes
     #   requests-oauthlib
-requests-oauthlib==1.4.0
+requests-oauthlib==2.0.0
     # via kubernetes
 resolvelib==1.0.1
     # via ansible-core
