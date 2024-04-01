@@ -74,7 +74,7 @@ pathspec==0.12.1
     #   yamllint
 platformdirs==4.2.0
     # via black
-pyasn1==0.5.1
+pyasn1==0.6.0
     # via
     #   pyasn1-modules
     #   rsa
