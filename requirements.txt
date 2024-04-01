@@ -32,7 +32,7 @@ click==8.1.7
 cryptography==42.0.5
     # via ansible-core
 docker==7.0.0
-filelock==3.13.1
+filelock==3.13.3
     # via ansible-lint
 google-auth==2.29.0
     # via kubernetes
