@@ -20,3 +20,4 @@ also required for successful pod networking.
 ## Other settings
 
 1. Install configs for `vim` and `tmux` on master-1
+
