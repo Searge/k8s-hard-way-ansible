@@ -1,5 +1,6 @@
 .idea
 .vagrant
+__pycache__
 temp
 *.crt
 *.key
