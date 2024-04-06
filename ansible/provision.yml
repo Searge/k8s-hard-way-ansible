@@ -1,0 +1,8 @@
+---
+- name: Provision servers
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Setup dotfiles
+      ansible.builtin.include_tasks: tasks/setup_dotfiles.yml
+      tags: dotfiles

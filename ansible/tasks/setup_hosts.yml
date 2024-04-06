@@ -1,0 +1,46 @@
+---
+- name: Get primary IP
+  # This command retrieves the primary IP address of the host by executing a series of shell commands.
+  # It uses the `ip` command to show the IPv4 addresses, filters out any dynamic or loopback addresses,
+  # and extracts the IP address using `awk` and `cut`.
+  ansible.builtin.shell:
+    cmd: >-
+      "set -o pipefail && ip -4 addr show |
+       grep 'inet' | egrep -v '(dynamic|127\\.0\\.0)' |
+       awk '{print $2}' | cut -d/ -f1"
+  register: primary_ip
+
+- name: Get network
+  # This command retrieves the network address by extracting the first three octets of the primary IP address.
+  # It uses `awk` to split the IP address into octets and then prints the first three octets.
+  ansible.builtin.shell:
+    cmd: >-
+      "set -o pipefail && echo {{ primary_ip.stdout }} |
+      awk 'BEGIN {FS=\".\"} ; { printf(\"%s.%s.%s\", $1, $2, $3) }'"
+  register: network
+
+- name: Export PRIMARY IP as an environment variable
+  ansible.builtin.lineinfile:
+    path: /etc/environment
+    line: "PRIMARY_IP={{ primary_ip.stdout }}"
+
+- name: Export architecture as environment variable
+  ansible.builtin.lineinfile:
+    path: /etc/environment
+    line: "ARCH=amd64"
+
+- name: Remove host entry
+  ansible.builtin.lineinfile:
+    path: /etc/hosts
+    line: "^.*{{ ansible_hostname }}.*"
+    state: absent
+
+- name: Update /etc/hosts about other hosts
+  ansible.builtin.blockinfile:
+    path: /etc/hosts
+    block: |
+      {{ network.stdout }}.11  controlplane01
+      {{ network.stdout }}.12  controlplane02
+      {{ network.stdout }}.21  node01
+      {{ network.stdout }}.22  node02
+      {{ network.stdout }}.30  loadbalancer
