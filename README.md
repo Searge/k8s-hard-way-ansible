@@ -1,5 +1,7 @@
 # Provisioning of Kubernetes the hard way with Ansible
 
+[![OpenSSF best practices badge](https://www.bestpractices.dev/projects/8684/badge)](https://www.bestpractices.dev/en/projects/8684)
+
 This repository contains an Ansible playbook to provision a Kubernetes cluster the hard way.
 And based on these two repositories:
 
