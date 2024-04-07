@@ -28,6 +28,7 @@
     repo: https://github.com/robbyrussell/oh-my-zsh.git
     dest: /home/{{ ansible_user }}/.oh-my-zsh
     single_branch: true
+    version: master
 
 - name: Copy dotfiles
   ansible.builtin.copy:
