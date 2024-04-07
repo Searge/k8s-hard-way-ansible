@@ -107,16 +107,14 @@ tasks:
   # ======================================================================
   # Vagrant tasks
   # ======================================================================
-  start:
+  up:
     cmds:
-      - vagrant up --provider=virtualbox
+      - vagrant up
     desc: Start Virtualbox VM
     summary: |
       Script for easy running vagrant up
 
       It runs vagrant up with default config on the ansible directory.
-      For Window machine you need change to:
-      - vagrant up --provider=hyperv
 
   stop:
     cmds:
@@ -125,32 +123,42 @@ tasks:
 
   destroy:
     cmds:
-      - vagrant destroy -f
-      - rm -rf .vagrant
-      - sed -i '/^jcdecaux.local/d' known_hosts
+      - vagrant destroy -f --parallel
+      - sed -i '/127.0.0.1/d' known_hosts
     desc: Delete Virtualbox VM from disk
+
+  status:
+    cmds:
+      - vagrant status
+    desc: Show Virtualbox VM names and statuses
 
   ssh:
     cmds:
-      - vagrant ssh
+      - vagrant ssh {{.CLI_ARGS}}
     desc: Start SSH session to Virtualbox VM
+    summary: |
+      Script for easy running vagrant ssh
 
-  box:
+      It takes all shell arguments, i.e., VM name, and everything you'll pass it.
+      Example: task ssh -- controlplane01
+
+  validate:
+    cmds:
+      - vagrant validate
+    desc: Validate Vagrantfile
+
+  box-ls:
     cmds:
       - vagrant box list
     desc: List available Vagrant boxes
 
+  box-upgrade:
+    cmds:
+      - vagrant box update
+    desc: Update Vagrant boxes
+
   vagrant-prune:
     cmds:
       - vagrant global-status --prune
+      - rm -rf .vagrant
     desc: Prune Vagrant global status
-
-  test-connectivity:
-    cmds:
-      - vagrant ssh -c "ping -c 1 jcdecaux.local"
-    desc: Test connectivity to Virtualbox VM
-
-  test-curl:
-    cmds:
-      - vagrant ssh -c "curl -I jcdecaux.local"
-    desc: Test curl to Virtualbox VM
