@@ -55,7 +55,7 @@ def provision_kubernetes_node(node)
   # Set up ssh
   node.vm.provision "setup-ssh", :type => "shell", :path => "vm/utils/ssh.sh"
   # Set up DNS
-  setup_dns node
+  # setup_dns node
   # Set up with Ansible
   node.vm.provision "ansible" do |ansible|
     ansible.compatibility_mode = "2.0"
@@ -149,14 +149,6 @@ Vagrant.configure("2") do |config|
       node.vm.network :private_network, ip: IP_NW + "#{NODE_IP_START + i}"
       node.vm.network "forwarded_port", guest: 22, host: "#{2720 + i}"
       provision_kubernetes_node node
-    end
-  end
-
-  # Modify all nodes to not use GUI and audio
-  config.vm.define "all" do |node|
-    node.vm.provider "virtualbox" do |vb|
-      vb.gui = false
-      vb.customize ["modifyvm", :id, "--audio", "none"]
     end
   end
 end

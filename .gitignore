@@ -1,6 +1,9 @@
 .idea
 .vagrant
+.venv
 __pycache__
+*.pyc
+known_hosts
 temp
 *.crt
 *.key
@@ -9,4 +12,3 @@ temp
 *csr.json
 *.kubeconfig
 quick-steps
-.venv
