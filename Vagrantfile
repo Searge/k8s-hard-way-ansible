@@ -1,6 +1,9 @@
 # -*- mode: ruby -*-
 # vi:set ft=ruby sw=2 ts=2 sts=2:
 
+# Define Vagrant box to use
+BOX_OS = "ubuntu/jammy64"
+
 # Define how much memory your computer has in GB (e.g. 8, 16)
 # Larger nodes will be created if you have more.
 RAM_SIZE = 8
@@ -9,9 +12,18 @@ RAM_SIZE = 8
 # More powerful workers will be created if you have more
 CPU_CORES = 4
 
+# Define the number of master and worker nodes. You should not change this
+NUM_CONTROL_NODES = 2
+NUM_WORKER_NODE = 2
+
 # Internal network prefix for the VM network
 # See the documentation before changing this
 IP_NW = "192.168.56."
+
+# Host address start points
+MASTER_IP_START = 10
+NODE_IP_START = 20
+LB_IP_START = 30
 
 # Calculate resource amounts
 # based on RAM/CPU
@@ -38,40 +50,18 @@ RESOURCES = {
   },
 }
 
-# Sets up hosts file and DNS
-def setup_dns(node)
-  # Set up /etc/hosts
-  node.vm.provision "setup-hosts", :type => "shell", :path => "vm/utils/setup-hosts.sh" do |s|
-    s.args = ["enp0s8", node.vm.hostname]
-  end
-  # Set up DNS resolution
-  # node.vm.provision "setup-dns", type: "shell", :path => "vm/utils/update-dns.sh"
-end
-
 # Runs provisioning steps that are required by masters and workers
 def provision_kubernetes_node(node)
-  # Set up kernel parameters, modules and tunables
-  node.vm.provision "setup-kernel", :type => "shell", :path => "vm/utils/setup-kernel.sh"
   # Set up ssh
   node.vm.provision "setup-ssh", :type => "shell", :path => "vm/utils/ssh.sh"
-  # Set up DNS
-  # setup_dns node
+
   # Set up with Ansible
   node.vm.provision "ansible" do |ansible|
     ansible.compatibility_mode = "2.0"
-    ansible.verbose = "v"
+    # ansible.verbose = "v"
     ansible.playbook = "ansible/provision.yml"
   end
 end
-
-# Define the number of master and worker nodes. You should not change this
-NUM_CONTROL_NODES = 2
-NUM_WORKER_NODE = 2
-
-# Host address start points
-MASTER_IP_START = 10
-NODE_IP_START = 20
-LB_IP_START = 30
 
 # All Vagrant configuration is done below. The "2" in Vagrant.configure
 # configures the configuration version (we support older styles for
@@ -85,7 +75,7 @@ Vagrant.configure("2") do |config|
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://vagrantcloud.com/search.
   # config.vm.box = "base"
-  config.vm.box = "debian/bookworm64"
+  config.vm.box = BOX_OS
   config.vm.boot_timeout = 900
 
   # Disable automatic box update checking. If you disable this, then
@@ -108,6 +98,7 @@ Vagrant.configure("2") do |config|
       node.vm.hostname = "controlplane0#{i}"
       node.vm.network :private_network, ip: IP_NW + "#{MASTER_IP_START + i}"
       node.vm.network "forwarded_port", guest: 22, host: "#{2710 + i}"
+      # Provision the node
       provision_kubernetes_node node
       if i == 1
         # Add cetificate verification scripts
@@ -130,9 +121,8 @@ Vagrant.configure("2") do |config|
     node.vm.hostname = "loadbalancer"
     node.vm.network :private_network, ip: IP_NW + "#{LB_IP_START}"
     node.vm.network "forwarded_port", guest: 22, host: 2730
-    # Set up ssh
-    node.vm.provision "setup-ssh", :type => "shell", :path => "vm/utils/ssh.sh"
-    setup_dns node
+    # Provision the node
+    provision_kubernetes_node node
   end
 
   # Provision Worker Nodes
@@ -148,6 +138,7 @@ Vagrant.configure("2") do |config|
       node.vm.hostname = "node0#{i}"
       node.vm.network :private_network, ip: IP_NW + "#{NODE_IP_START + i}"
       node.vm.network "forwarded_port", guest: 22, host: "#{2720 + i}"
+      # Provision the node
       provision_kubernetes_node node
     end
   end
