@@ -22,6 +22,7 @@
       ansible.builtin.file:
         path: /etc/sysctl.d/10-kubernetes.conf
         state: touch
+        mode: '0644'
 
     - name: Set network tunables
       ansible.builtin.blockinfile:
