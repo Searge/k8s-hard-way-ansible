@@ -1,29 +1,37 @@
 ---
-- name: Add br_netfilter kernel module
-  ansible.builtin.blockinfile:
-    path: /etc/modules
-    block: |
-      ip_vs
-      ip_vs_rr
-      ip_vs_wrr
-      ip_vs_sh
-      br_netfilter
-      nf_conntrack
+- name: Set up kernel parameters, modules and tunables
+  become: true
+  block:
+    - name: Add br_netfilter kernel module
+      ansible.builtin.blockinfile:
+        path: /etc/modules
+        block: |
+          ip_vs
+          ip_vs_rr
+          ip_vs_wrr
+          ip_vs_sh
+          br_netfilter
+          nf_conntrack
 
-- name: Restart systemd-modules-load.service
-  ansible.builtin.systemd:
-    name: systemd-modules-load.service
-    state: restarted
+    - name: Restart systemd-modules-load.service
+      ansible.builtin.systemd:
+        name: systemd-modules-load.service
+        state: restarted
 
-- name: Set network tunables
-  ansible.builtin.blockinfile:
-    path: /etc/sysctl.d/10-kubernetes.conf
-    block: |
-      net.ipv6.conf.all.disable_ipv6 = 1
-      net.ipv6.conf.default.disable_ipv6 = 1
-      net.ipv6.conf.lo.disable_ipv6 = 1
-      net.bridge.bridge-nf-call-iptables=1
-      net.ipv4.ip_forward=1
+    - name: Create /etc/sysctl.d/10-kubernetes.conf
+      ansible.builtin.file:
+        path: /etc/sysctl.d/10-kubernetes.conf
+        state: touch
 
-- name: Reload sysctl
-  ansible.builtin.command: sysctl --system
+    - name: Set network tunables
+      ansible.builtin.blockinfile:
+        path: /etc/sysctl.d/10-kubernetes.conf
+        block: |
+          net.ipv6.conf.all.disable_ipv6 = 1
+          net.ipv6.conf.default.disable_ipv6 = 1
+          net.ipv6.conf.lo.disable_ipv6 = 1
+          net.bridge.bridge-nf-call-iptables=1
+          net.ipv4.ip_forward=1
+
+    - name: Reload sysctl
+      ansible.builtin.command: sysctl --system

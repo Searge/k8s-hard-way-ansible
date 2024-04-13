@@ -1,14 +1,19 @@
-.idea
+# Vagrant
 .vagrant
+
+# Python and Ansible
 .venv
 __pycache__
 *.pyc
+
+*test.*
 known_hosts
 temp
+
+# Kubernetes
 *.crt
 *.key
 *.pem
 *.csr
 *csr.json
 *.kubeconfig
-quick-steps

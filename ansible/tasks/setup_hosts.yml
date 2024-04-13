@@ -1,46 +1,104 @@
 ---
-- name: Get primary IP
-  # This command retrieves the primary IP address of the host by executing a series of shell commands.
-  # It uses the `ip` command to show the IPv4 addresses, filters out any dynamic or loopback addresses,
-  # and extracts the IP address using `awk` and `cut`.
-  ansible.builtin.shell:
-    cmd: >-
-      set -o pipefail && ip -4 addr show |
-       grep 'inet' | egrep -v '(dynamic|127\\.0\\.0)' |
-       awk '{print $2}' | cut -d/ -f1
+- name: Get public IP
+  ansible.builtin.debug:
+    msg: "{{ ansible_default_ipv4.address }}"
   register: primary_ip
 
-- name: Get network
-  # This command retrieves the network address by extracting the first three octets of the primary IP address.
-  # It uses `awk` to split the IP address into octets and then prints the first three octets.
-  ansible.builtin.shell:
-    cmd: >-
-      set -o pipefail && echo {{ primary_ip.stdout }} |
-      awk 'BEGIN {FS=\".\"} ; { printf(\"%s.%s.%s\", $1, $2, $3) }'
+- name: Get all network interfaces
+  ansible.builtin.debug:
+    msg: "{{ ansible_interfaces }}"
+  register: interfaces
+
+- name: List IP addresses
+  ansible.builtin.debug:
+    msg: "{{ ansible_all_ipv4_addresses }}"
+  register: all_ips
+
+- name: Get private IP
+  ansible.builtin.debug:
+    msg: "{{ ansible_all_ipv4_addresses | difference([primary_ip.msg]) }}"
+  register: private_ip
+
+- name: Get network for private IP
+  ansible.builtin.debug:
+    msg: >-
+      {{
+      private_ip.msg[0].split('.')[0]
+      }}.{{
+      private_ip.msg[0].split('.')[1]
+      }}.{{
+      private_ip.msg[0].split('.')[2]
+      }}
   register: network
 
-- name: Export PRIMARY IP as an environment variable
-  ansible.builtin.lineinfile:
-    path: /etc/environment
-    line: "PRIMARY_IP={{ primary_ip.stdout }}"
+- name: Setup ENV variables and hosts
+  become: true
+  block:
+    - name: Export PRIMARY IP as an environment variable
+      ansible.builtin.lineinfile:
+        path: /etc/environment
+        line: "PRIMARY_IP={{ private_ip.msg[0] }}"
 
-- name: Export architecture as environment variable
-  ansible.builtin.lineinfile:
-    path: /etc/environment
-    line: "ARCH=amd64"
+    - name: Get OS architecture
+      when: ansible_os_family == 'Debian'
+      ansible.builtin.shell: dpkg --print-architecture
+      register: arch
 
-- name: Remove host entry
-  ansible.builtin.lineinfile:
-    path: /etc/hosts
-    line: "^.*{{ ansible_hostname }}.*"
-    state: absent
+    - name: Export architecture as environment variable
+      ansible.builtin.lineinfile:
+        path: /etc/environment
+        line: "ARCH={{ arch.stdout }}"
 
-- name: Update /etc/hosts about other hosts
-  ansible.builtin.blockinfile:
-    path: /etc/hosts
-    block: |
-      {{ network.stdout }}.11  controlplane01
-      {{ network.stdout }}.12  controlplane02
-      {{ network.stdout }}.21  node01
-      {{ network.stdout }}.22  node02
-      {{ network.stdout }}.30  loadbalancer
+    - name: Remove host entry
+      ansible.builtin.lineinfile:
+        path: /etc/hosts
+        line: "^.*{{ ansible_hostname }}.*"
+        state: absent
+
+    - name: Update /etc/hosts about other hosts
+      ansible.builtin.blockinfile:
+        path: /etc/hosts
+        block: |
+          {{ network.msg }}.11  controlplane01
+          {{ network.msg }}.12  controlplane02
+          {{ network.msg }}.21  node01
+          {{ network.msg }}.22  node02
+          {{ network.msg }}.30  loadbalancer
+
+- name: Setup Cloudflare DNS server
+  become: true
+  block:
+    - name: Check if resolv.conf is present
+      ansible.builtin.stat:
+        path: /etc/resolv.conf
+      register: resolv
+
+    - name: Check if systemd-resolved is in use
+      ansible.builtin.stat:
+        path: /etc/systemd/resolved.conf
+      register: resolved
+
+    - name: Update resolv.conf
+      when: resolv.stat.exists and not resolved.stat.exists
+      ansible.builtin.lineinfile:
+        path: /etc/resolv.conf
+        backup: true
+        line: |
+          nameserver 1.1.1.1
+          nameserver 1.0.0.1
+
+    - name: Update resolved.conf
+      when: resolved.stat.exists
+      ansible.builtin.lineinfile:
+        path: /etc/systemd/resolved.conf
+        backup: true
+        regexp: '^#DNS='
+        line: 'DNS=1.1.1.1'
+
+
+
+    - name: Restart systemd-resolved
+      when: resolved.stat.exists
+      ansible.builtin.systemd:
+        name: systemd-resolved
+        state: restarted
