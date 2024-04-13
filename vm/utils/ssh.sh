@@ -32,7 +32,7 @@ then
     fi
 
     # Copy the keys to the shared folder `/vagrant/.vagrant/ssh/`
-    if [-f /home/vagrant/.ssh/id_ed25519 ]
+    if [[ -f /home/vagrant/.ssh/id_ed25519 && ! -f /vagrant/.vagrant/ssh/id_ed25519 ]]
     then
         cp /home/vagrant/.ssh/id_* /vagrant/.vagrant/ssh/
     fi
