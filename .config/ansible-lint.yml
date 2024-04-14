@@ -22,6 +22,7 @@ exclude_paths:
   - .config/
   - scripts/
   - roles/
+  - files/
 
 use_default_rules: true
 
