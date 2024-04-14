@@ -39,6 +39,19 @@ tasks:
                     uv pip install -r requirements.txt
                     ansible-galaxy collection install -r requirements.yml
 
+  bump:
+    desc: "task bump -- <VERSION> (optional)"
+    summary: |
+      Script for easy bumping the version of the project
+
+      It utilizes scripts/bump.sh with the git-cliff to bump the version
+      of the project. It takes all shell arguments, i.e., version, and
+      everything you'll pass it.
+      But if you don't pass the version, it will bump the version based on
+      the git-cliff configuration.
+    cmds:
+      - bash ./scripts/bump.sh {{.CLI_ARGS}}
+
   # ======================================================================
   # Python tasks
   # ======================================================================
