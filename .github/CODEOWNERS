@@ -1,0 +1,11 @@
+# The owners of the repository
+* @Searge
+
+# The owners of .github & .config directories
+/.github/ @geekopsua/cloud-devs
+/.config/ @geekopsua/cloud-devs
+
+# The owners of application code and documentation
+/ansible/ @geekopsua/cloud-devs @geekopsua/devops-geeks
+/docs/ @geekopsua/cloud-devs @geekopsua/devops-geeks
+/scripts/ @geekopsua/cloud-devs @geekopsua/devops-geeks
