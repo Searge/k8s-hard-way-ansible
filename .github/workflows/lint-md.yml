@@ -1,11 +1,11 @@
 ﻿name: Lint Markdown documents
 on:
   push:
-    branches-ignore:
-      - main
-    # paths:
-    #   - "docs/**"
-    #   - "/README.md"
+    # branches-ignore:
+    #   - main
+    paths:
+      - "docs/**"
+      - "/README.md"
 
 permissions:
   contents: read
