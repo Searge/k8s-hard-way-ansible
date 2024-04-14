@@ -1,7 +1,7 @@
 # Provisioning of Kubernetes the hard way with Ansible
 
-[![OpenSSF best practices badge](https://www.bestpractices.dev/projects/8684/badge)](https://www.bestpractices.dev/en/projects/8684)
-![openssf scorecards](https://api.securityscorecards.dev/projects/github.com/Searge/k8s-hard-way-ansible/badge)
+[![OpenSSF best practices badge](https://www.bestpractices.dev/projects/8789/badge)](https://www.bestpractices.dev/en/projects/8789)
+[![openssf scorecards](https://api.securityscorecards.dev/projects/github.com/GeekOpsUA/k8s-hard-way-ansible/badge)](https://api.securityscorecards.dev/projects/github.com/GeekOpsUA/k8s-hard-way-ansible)
 
 ## Description
 
@@ -22,7 +22,7 @@ set up Kubernetes clusters for testing or deployment purposes.
 
 ### Credits
 
-This educational project is based on these two repositories:
+This project is based on these two repositories:
 
 - [kelseyhightower/kubernetes-the-hard-way](https://github.com/kelseyhightower/kubernetes-the-hard-way)
 - [mmumshad/kubernetes-the-hard-way](https://github.com/mmumshad/kubernetes-the-hard-way)
@@ -66,9 +66,3 @@ source .venv/bin/activate
 # For example
 ansible-inventory --list all | bat -l json
 ```
-
-## CPE Name
-
-The Common Platform Enumeration (CPE) name for this project is:
-
-`cpe:2.3:a:searge:k8s_hard_way_ansible:*:*:*:*:*:*:*:*`
