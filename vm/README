@@ -1,0 +1,5 @@
+Necessary files for Vagrant
+===========================
+
+This folder contains the necessary files to provision a Vagrant box with the
+ssh key and the necessary files to test certificates.

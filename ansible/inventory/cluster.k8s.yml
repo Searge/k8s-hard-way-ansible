@@ -1,4 +1,5 @@
+---
 plugin: kubernetes.core.k8s
 connections:
-- namespaces:
-    - vault
+  - namespaces:
+      - vault
