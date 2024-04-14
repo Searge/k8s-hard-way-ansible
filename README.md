@@ -2,6 +2,7 @@
 
 [![OpenSSF best practices badge](https://www.bestpractices.dev/projects/8789/badge)](https://www.bestpractices.dev/en/projects/8789)
 [![openssf scorecards](https://api.securityscorecards.dev/projects/github.com/GeekOpsUA/k8s-hard-way-ansible/badge)](https://api.securityscorecards.dev/projects/github.com/GeekOpsUA/k8s-hard-way-ansible)
+[![Quality gate](https://sonarcloud.io/api/project_badges/quality_gate?project=GeekOpsUA_k8s-hard-way-ansible)](https://sonarcloud.io/summary/new_code?id=GeekOpsUA_k8s-hard-way-ansible)
 
 ## Description
 
