@@ -1,6 +1,7 @@
 # Provisioning of Kubernetes the hard way with Ansible
 
 [![OpenSSF best practices badge](https://www.bestpractices.dev/projects/8684/badge)](https://www.bestpractices.dev/en/projects/8684)
+![openssf scorecards](https://api.securityscorecards.dev/projects/github.com/Searge/k8s-hard-way-ansible/badge)
 
 ## Description
 
