@@ -9,6 +9,3 @@
 /ansible/ @geekopsua/cloud-devs @geekopsua/devops-geeks
 /docs/ @geekopsua/cloud-devs @geekopsua/devops-geeks
 /scripts/ @geekopsua/cloud-devs @geekopsua/devops-geeks
-
-# The owners of /requirements.txt
-/requirements.txt @Searge @mergify @dependabot
