@@ -27,11 +27,10 @@
 
     - name: Define regex patterns for each host
       ansible.builtin.set_fact:
-        "{{ item }}_pattern": "(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})\\s+{{ item }}"
-      loop:
-        - controlplane01
-        - controlplane02
-        - loadbalancer
+        "controlplane01_pattern": "(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})\\s+controlplane01"
+        "controlplane02_pattern": "(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})\\s+controlplane02"
+        "loadbalancer_pattern": "(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})\\s+loadbalancer"
+
 
     - name: Extract IP addresses for specified hosts
       ansible.builtin.set_fact:
