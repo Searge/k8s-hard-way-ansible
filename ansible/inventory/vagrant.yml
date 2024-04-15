@@ -21,6 +21,10 @@ etcd:
   children:
     vagrant_control:
 
+kube_load_balancer:
+  children:
+    vagrant_lb:
+
 kube_nodes:
   children:
     vagrant_nodes:
