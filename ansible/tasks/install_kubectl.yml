@@ -1,0 +1,33 @@
+---
+
+- name: Get ARCH variable from /etc/environment
+  ansible.builtin.shell:
+    cmd: "set -o pipefail ; grep -E '^ARCH=' /etc/environment | cut -d'=' -f2"
+  args:
+    executable: /bin/bash
+  register: arch_var
+
+- name: Get stable release version of kubectl
+  ansible.builtin.uri:
+    url: https://dl.k8s.io/release/stable.txt
+    return_content: true
+  register: kubectl_version
+
+- name: Install latest stable kubectl
+  become: true
+  ansible.builtin.get_url:
+    url: "https://dl.k8s.io/release/{{ kubectl_version.content }}/bin/linux/{{ arch_var.stdout }}/kubectl"
+    dest: /usr/local/bin/kubectl
+    mode: '0755'
+
+- name: Print kubectl version
+  ansible.builtin.shell:
+    cmd: "set -o pipefail; kubectl version | grep -i client"
+  args:
+    executable: /bin/bash
+  ignore_errors: true
+  register: kubectl_version
+
+- name: Print the kubectl version
+  ansible.builtin.debug:
+    msg: "KUBECTL_VERSION: {{ kubectl_version.stdout }}"
