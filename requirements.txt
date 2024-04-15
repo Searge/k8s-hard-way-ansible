@@ -55,6 +55,7 @@ mdurl==0.1.2
     # via markdown-it-py
 mypy-extensions==1.0.0
     # via black
+netaddr==1.2.1
 oauthlib==3.2.2
     # via
     #   kubernetes
