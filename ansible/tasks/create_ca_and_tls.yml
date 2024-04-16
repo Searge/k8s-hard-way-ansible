@@ -49,33 +49,23 @@
 - name: Generate Certificate Authority
   run_once: true
   block:
-    - name: Create a directories for Certificates
-      ansible.builtin.file:
-        path: "{{ item }}"
-        state: directory
-        mode: '0700'
-      loop:
-        - "{{ certs_path }}"
-        - "{{ certs_path }}"
-        - "{{ certs_path }}"
-
     - name: Generate a CA private key
       community.crypto.openssl_privatekey:
-        path: "{{ certs_path }}/k8s-ca.key"
-        type: Ed25519
+        path: "{{ certs_path }}/ca.key"
 
     - name: Create CSR using the private key
       community.crypto.openssl_csr:
-        path: "{{ certs_path }}/k8s-ca.csr"
-        privatekey_path: "{{ certs_path }}/k8s-ca.key"
-        common_name: "kubernetes"
-        organization_name: "Kubernetes"
+        path: "{{ certs_path }}/ca.csr"
+        privatekey_path: "{{ certs_path }}/ca.key"
+        subject:
+          CN: "KUBERNETES-CA"
+          O: "Kubernetes"
 
     - name: Self sign the csr using its own private key
       community.crypto.x509_certificate:
-        path: "{{ certs_path }}/k8s-ca.crt"
-        privatekey_path: "{{ certs_path }}/k8s-ca.key"
-        csr_path: "{{ certs_path }}/k8s-ca.csr"
+        path: "{{ certs_path }}/ca.crt"
+        privatekey_path: "{{ certs_path }}/ca.key"
+        csr_path: "{{ certs_path }}/ca.csr"
         provider: selfsigned
 
 - name: Generate Client and Server Certificates
@@ -84,80 +74,80 @@
     - name: Generate private key for admin user
       community.crypto.openssl_privatekey:
         path: "{{ certs_path }}/admin.key"
-        type: Ed25519
 
     - name: Create CSR using the private key
       community.crypto.openssl_csr:
         path: "{{ certs_path }}/admin.csr"
         privatekey_path: "{{ certs_path }}/admin.key"
-        common_name: "admin"
-        organization_name: "system:masters"
+        subject:
+          CN: "admin"
+          O: "system:masters"
 
     - name: Sign certificate for admin user using CA servers private key
       community.crypto.x509_certificate:
         path: "{{ certs_path }}/admin.crt"
-        ownca_path: "{{ certs_path }}/k8s-ca.crt"
-        ownca_privatekey_path: "{{ certs_path }}/k8s-ca.key"
+        ownca_path: "{{ certs_path }}/ca.crt"
+        ownca_privatekey_path: "{{ certs_path }}/ca.key"
         csr_path: "{{ certs_path }}/admin.csr"
         provider: ownca
 
     - name: Generate Controller Manager Client Certificate
       community.crypto.openssl_privatekey:
         path: "{{ certs_path }}/kube-controller-manager.key"
-        type: Ed25519
 
     - name: Create CSR using the private key
       community.crypto.openssl_csr:
         path: "{{ certs_path }}/kube-controller-manager.csr"
         privatekey_path: "{{ certs_path }}/kube-controller-manager.key"
-        common_name: "system:kube-controller-manager"
-        organization_name: "system:kube-controller-manager"
+        subject:
+          CN: "system:kube-controller-manager"
+          O: "system:kube-controller-manager"
 
     - name: Sign certificate for kube-controller-manager using CA servers private key
       community.crypto.x509_certificate:
         path: "{{ certs_path }}/kube-controller-manager.crt"
-        ownca_path: "{{ certs_path }}/k8s-ca.crt"
-        ownca_privatekey_path: "{{ certs_path }}/k8s-ca.key"
+        ownca_path: "{{ certs_path }}/ca.crt"
+        ownca_privatekey_path: "{{ certs_path }}/ca.key"
         csr_path: "{{ certs_path }}/kube-controller-manager.csr"
         provider: ownca
 
     - name: Generate Kube Proxy Client Certificate
       community.crypto.openssl_privatekey:
         path: "{{ certs_path }}/kube-proxy.key"
-        type: Ed25519
 
     - name: Create CSR using the private key
       community.crypto.openssl_csr:
         path: "{{ certs_path }}/kube-proxy.csr"
         privatekey_path: "{{ certs_path }}/kube-proxy.key"
-        common_name: "system:kube-proxy"
-        organization_name: "system:kube-proxy"
+        subject:
+          CN: "system:kube-proxy"
+          O: "system:node-proxier"
 
     - name: Sign certificate for kube-proxy using CA servers private key
       community.crypto.x509_certificate:
         path: "{{ certs_path }}/kube-proxy.crt"
-        ownca_path: "{{ certs_path }}/k8s-ca.crt"
-        ownca_privatekey_path: "{{ certs_path }}/k8s-ca.key"
+        ownca_path: "{{ certs_path }}/ca.crt"
+        ownca_privatekey_path: "{{ certs_path }}/ca.key"
         csr_path: "{{ certs_path }}/kube-proxy.csr"
         provider: ownca
 
     - name: Generate Scheduler Client Certificate
       community.crypto.openssl_privatekey:
         path: "{{ certs_path }}/kube-scheduler.key"
-        type: Ed25519
 
     - name: Create CSR using the private key
       community.crypto.openssl_csr:
         path: "{{ certs_path }}/kube-scheduler.csr"
         privatekey_path: "{{ certs_path }}/kube-scheduler.key"
-        common_name: "system:kube-scheduler"
-        organization_name: "system:kube-scheduler"
+        subject:
+          CN: "system:kube-scheduler"
+          O: "system:kube-scheduler"
 
     - name: Sign certificate for kube-scheduler using CA servers private key
       community.crypto.x509_certificate:
         path: "{{ certs_path }}/kube-scheduler.crt"
-        ownca_path: "{{ certs_path }}/k8s-ca.crt"
-        ownca_privatekey_path: "{{ certs_path }}/k8s-ca.key"
+        ownca_path: "{{ certs_path }}/ca.crt"
+        ownca_privatekey_path: "{{ certs_path }}/ca.key"
         csr_path: "{{ certs_path }}/kube-scheduler.csr"
         provider: ownca
 
@@ -173,7 +163,6 @@
     - name: Generate Kubernetes API Server Certificate
       community.crypto.openssl_privatekey:
         path: "{{ certs_path }}/kube-apiserver.key"
-        type: Ed25519
 
     - name: Generate a CSR for the Kubernetes API Server
       community.crypto.openssl_csr:
@@ -188,8 +177,9 @@
           - keyEncipherment
         extended_key_usage:
           - serverAuth
-        common_name: "kube-apiserver"
-        organization_name: "Kubernetes"
+        subject:
+          CN: "kube-apiserver"
+          O: "Kubernetes"
         subject_alt_name: |
           DNS:kubernetes;
           DNS:kubernetes.default;
@@ -205,8 +195,8 @@
     - name: Sign the CSR using the CA private key
       community.crypto.x509_certificate:
         path: "{{ certs_path }}/kube-apiserver.crt"
-        ownca_path: "{{ certs_path }}/k8s-ca.crt"
-        ownca_privatekey_path: "{{ certs_path }}/k8s-ca.key"
+        ownca_path: "{{ certs_path }}/ca.crt"
+        ownca_privatekey_path: "{{ certs_path }}/ca.key"
         csr_path: "{{ certs_path }}/kube-apiserver.csr"
         provider: ownca
 
@@ -216,15 +206,15 @@
 
     - name: Generate API Server Kubelet Client Certificate
       community.crypto.openssl_privatekey:
-        path: "{{ certs_path }}/kube-apiserver-kubelet-client.key"
-        type: Ed25519
+        path: "{{ certs_path }}/apiserver-kubelet-client.key"
 
     - name: Create CSR using the private key
       community.crypto.openssl_csr:
-        path: "{{ certs_path }}/kube-apiserver-kubelet-client.csr"
-        privatekey_path: "{{ certs_path }}/kube-apiserver-kubelet-client.key"
-        common_name: "kube-apiserver-kubelet-client"
-        organization_name: "Kubernetes"
+        path: "{{ certs_path }}/apiserver-kubelet-client.csr"
+        privatekey_path: "{{ certs_path }}/apiserver-kubelet-client.key"
+        subject:
+          CN: "kube-apiserver-kubelet-client"
+          O: "system:masters"
         basic_constraints_critical: true
         basic_constraints: "CA:FALSE"
         key_usage_critical: true
@@ -235,12 +225,12 @@
         extended_key_usage:
           - clientAuth
 
-    - name: Sign certificate for kube-apiserver-kubelet-client using CA servers private key
+    - name: Sign certificate for apiserver-kubelet-client using CA servers private key
       community.crypto.x509_certificate:
-        path: "{{ certs_path }}/kube-apiserver-kubelet-client.crt"
-        ownca_path: "{{ certs_path }}/k8s-ca.crt"
-        ownca_privatekey_path: "{{ certs_path }}/k8s-ca.key"
-        csr_path: "{{ certs_path }}/kube-apiserver-kubelet-client.csr"
+        path: "{{ certs_path }}/apiserver-kubelet-client.crt"
+        ownca_path: "{{ certs_path }}/ca.crt"
+        ownca_privatekey_path: "{{ certs_path }}/ca.key"
+        csr_path: "{{ certs_path }}/apiserver-kubelet-client.csr"
         provider: ownca
 
     # The ETCD Server Certificate
@@ -251,7 +241,6 @@
     - name: Generate ETCD Server Certificate
       community.crypto.openssl_privatekey:
         path: "{{ certs_path }}/etcd-server.key"
-        type: Ed25519
 
     - name: Create CSR using the private key for etcd-server
       community.crypto.openssl_csr:
@@ -262,8 +251,9 @@
           - nonRepudiation
           - digitalSignature
           - keyEncipherment
-        common_name: "etcd-server"
-        organization_name: "Kubernetes"
+        subject:
+          CN: "etcd-server"
+          O: "Kubernetes"
         subject_alt_name: |
           DNS:localhost;
           IP:{{ controlplane01_ip }};
@@ -273,8 +263,8 @@
     - name: Sign certificate for etcd-server using CA servers private key
       community.crypto.x509_certificate:
         path: "{{ certs_path }}/etcd-server.crt"
-        ownca_path: "{{ certs_path }}/k8s-ca.crt"
-        ownca_privatekey_path: "{{ certs_path }}/k8s-ca.key"
+        ownca_path: "{{ certs_path }}/ca.crt"
+        ownca_privatekey_path: "{{ certs_path }}/ca.key"
         csr_path: "{{ certs_path }}/etcd-server.csr"
         provider: ownca
 
@@ -284,33 +274,30 @@
     - name: Generate Service Account Key Pair
       community.crypto.openssl_privatekey:
         path: "{{ certs_path }}/service-account.key"
-        type: Ed25519
 
     - name: Create CSR using the private key
       community.crypto.openssl_csr:
         path: "{{ certs_path }}/service-account.csr"
         privatekey_path: "{{ certs_path }}/service-account.key"
-        common_name: "service-account"
-        organization_name: "Kubernetes"
+        subject:
+          CN: "service-accounts"
+          O: "Kubernetes"
 
     - name: Sign certificate for service-account using CA servers private key
       community.crypto.x509_certificate:
         path: "{{ certs_path }}/service-account.crt"
-        ownca_path: "{{ certs_path }}/k8s-ca.crt"
-        ownca_privatekey_path: "{{ certs_path }}/k8s-ca.key"
+        ownca_path: "{{ certs_path }}/ca.crt"
+        ownca_privatekey_path: "{{ certs_path }}/ca.key"
         csr_path: "{{ certs_path }}/service-account.csr"
         provider: ownca
 
-- name: Verify the PKI with cer_verify.sh
+- name: Display the generated certificates
   run_once: true
-  ansible.builtin.shell:
-    cmd: "{{ certs_path }}/cert_verify.sh"
-  args:
-    chdir: "{{ certs_path }}"
-    executable: /bin/bash
-  register: cert_verify_output
-  changed_when: false
-
-- name: Display the output of the certificate verification
   ansible.builtin.debug:
-    msg: "{{ cert_verify_output.stdout_lines }}"
+    msg: |
+      The certificates have been generated successfully
+
+      Please find the certificates in the following location:
+      {{ certs_path }}
+      And run the following command to verify the certificates:
+      ./cert_verify.sh
