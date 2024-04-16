@@ -115,7 +115,7 @@ check_cert_and_key()
                 CERT_ISSUER=$(sudo openssl x509 -in $cert -text | grep "Issuer: CN"| tr -d " ")
                 CERT_MD5=$(sudo openssl x509 -noout -modulus -in $cert | openssl md5| awk '{print $2}')
                 KEY_MD5=$(sudo openssl rsa -noout -modulus -in $key | openssl md5| awk '{print $2}')
-                if [ $CERT_SUBJECT == "${subject}" ] && [ $CERT_ISSUER == "${issuer}" ] && [ $CERT_MD5 == $KEY_MD5 ]
+                if [ "$CERT_SUBJECT" == "${subject}" ] && [ "$CERT_ISSUER" == "${issuer}" ] && [ "$CERT_MD5" == "$KEY_MD5" ]
                     then
                         printf "${SUCCESS}${name} cert and key are correct\n${NC}"
                     else
