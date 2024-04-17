@@ -2,6 +2,18 @@
 ansible_user: core
 
 #############################################
+# MARK: - Kubernetes specific variables
+#############################################
+# Kubernetes directories paths
+k8s_dir: "/etc/kubernetes"
+k8s_conf_dir: "{{ k8s_dir }}/conf"
+k8s_cert_dir: "{{ k8s_dir }}/certs"
+k8s_manifest_dir: "{{ k8s_dir }}/manifests"
+k8s_lib_dir: "/var/lib/kubernetes"
+k8s_log_dir: "/var/log/kubernetes"
+k8s_bin_dir: "/usr/local/bin"
+
+#############################################
 # MARK: - Ansible specific variables
 #############################################
 ansible_python_interpreter: "/usr/bin/python3"
