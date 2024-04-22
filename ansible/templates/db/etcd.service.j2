@@ -1,0 +1,15 @@
+# FILE MANAGED BY ANSIBLE: DO NOT EDIT!
+# {{ ansible_managed }}
+{% set etcd_hostname = inventory_hostname %}
+{% set primary_ip = ansible_all_ipv4_addresses[1] %}
+[Unit]
+Description=etcd
+Documentation=https://github.com/coreos
+
+[Service]
+ExecStart=/usr/local/bin/etcd --name {{ etcd_hostname }} --cert-file=/etc/etcd/etcd-server.crt --key-file=/etc/etcd/etcd-server.key --peer-cert-file=/etc/etcd/etcd-server.crt --peer-key-file=/etc/etcd/etcd-server.key --trusted-ca-file=/etc/etcd/ca.crt --peer-trusted-ca-file=/etc/etcd/ca.crt --peer-client-cert-auth --client-cert-auth --initial-advertise-peer-urls https://{{ primary_ip }}:2380 --listen-peer-urls https://{{ primary_ip }}:2380 --listen-client-urls https://{{ primary_ip }}:2379,https://127.0.0.1:2379 --advertise-client-urls https://{{ primary_ip }}:2379 --initial-cluster-token etcd-cluster-0 --initial-cluster controlplane01=https://{{ controlplane1_ip }}:2380,controlplane02=https://{{ controlplane2_ip }}:2380 --initial-cluster-state new --data-dir=/var/lib/etcd
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

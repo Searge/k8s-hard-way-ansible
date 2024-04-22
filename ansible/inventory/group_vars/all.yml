@@ -10,8 +10,15 @@ k8s_conf_dir: "{{ k8s_dir }}/conf"
 k8s_cert_dir: "{{ k8s_dir }}/certs"
 k8s_manifest_dir: "{{ k8s_dir }}/manifests"
 k8s_lib_dir: "/var/lib/kubernetes"
+k8s_lib_pki: "/var/lib/kubernetes/pki"
 k8s_log_dir: "/var/log/kubernetes"
 k8s_bin_dir: "/usr/local/bin"
+
+etcd_version: "v3.5.13"
+etcd_google_url: https://storage.googleapis.com/etcd
+etcd_github_url: https://github.com/etcd-io/etcd/releases/download
+etcd_config: "/etc/etcd"
+etcd_libs: "/var/lib/etcd"
 
 #############################################
 # MARK: - Ansible specific variables

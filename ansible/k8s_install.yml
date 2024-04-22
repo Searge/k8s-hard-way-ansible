@@ -116,3 +116,13 @@
     - name: Generating the Data Encryption Config and Key
       ansible.builtin.include_tasks: tasks/generate_encryption_config.yml
       tags: encryption
+
+# docs/07-bootstrapping-etcd.md
+- name: Bootstrapping the etcd Cluster
+  hosts: kube_control_plane
+  tags: etcd
+  gather_facts: false
+  tasks:
+    - name: Bootstrapping the etcd Cluster
+      ansible.builtin.include_tasks: tasks/bootstrap_etcd.yml
+      tags: etcd
