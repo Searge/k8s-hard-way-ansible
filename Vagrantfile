@@ -102,8 +102,8 @@ Vagrant.configure("2") do |config|
       provision_kubernetes_node node
       if i == 1
         # Add cetificate verification scripts
-        node.vm.provision "file", source: "vm/utils/cert_verify.sh", destination: "$HOME/cert_verify.sh"
-        node.vm.provision "file", source: "vm/utils/approve-csr.sh", destination: "$HOME/approve-csr.sh"
+        node.vm.provision "file", source: "vm/utils/cert_verify.sh", destination: "$HOME/certs/cert_verify.sh"
+        node.vm.provision "file", source: "vm/utils/approve_csr.sh", destination: "$HOME/certs/approve_csr.sh"
       end
     end
   end

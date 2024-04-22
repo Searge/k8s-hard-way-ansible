@@ -1,2 +1,7 @@
 ---
 ansible_user: vagrant
+
+service_cidr: "10.96.0.0/24"
+
+# certs_path: "{{ ansible_user_dir }}/"
+local_certs_path: "files/pki"

@@ -31,33 +31,36 @@ else
 fi
 echo "Bumping version from $VERSION to v$NEW_VERSION"
 
-# Update the version in the pyproject.toml file
+# Update the version in the project files
 sed -i "s/version = \"$VERSION\"/version = \"v$NEW_VERSION\"/g" pyproject.toml
-# Update the version in the CITATION.cff file
 sed -i "s/version: $VERSION/version: v$NEW_VERSION/g" CITATION.cff
 
-# Update the CHANGELOG.md file with git-cliff
+# Generate the CHANGELOG.md file (without committing)
 if ! command -v git-cliff &> /dev/null
 then
-    echo "git-cliff could not be found. Please install git-cliff to generate the CHANGELOG.md file."
-    exit 1
+  echo "git-cliff could not be found. Please install git-cliff to generate the CHANGELOG.md file."
+  exit 1
 fi
 
 if [ -z "$USER_VERSION" ]; then
-    git-cliff --tag v$NEW_VERSION --output CHANGELOG.md
+  git-cliff --tag v$NEW_VERSION --output CHANGELOG.md
 else
-    git-cliff --output CHANGELOG.md
+  git-cliff --output CHANGELOG.md
 fi
 
-# Commit the changes
+# Allow editing of CHANGELOG.md
+echo "************************************************************"
+echo "* CHANGELOG.md has been generated. Please review and edit *"
+echo "* it if necessary before proceeding.                     *"
+echo "************************************************************"
+read -p "Press [Enter] when you're ready to commit the changes..."
+
+# Commit the changes (including the edited CHANGELOG.md)
 git add pyproject.toml CITATION.cff CHANGELOG.md
-# Write the conventional commit message
 git commit -m ":bookmark:: bump version to v$NEW_VERSION"
-# Tag the commit
 git tag "v$NEW_VERSION"
 
 # Push the changes
 git push origin v$NEW_VERSION -f
 
 exit $?
-

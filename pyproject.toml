@@ -23,6 +23,7 @@ dependencies = [
     "passlib>=1.7",
     "docker",
     "kubernetes",
+    "netaddr",
     "ruff",
     "yamllint",
     "ansible-lint",

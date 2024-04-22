@@ -1,0 +1,128 @@
+---
+# Based on Mumshad Mannambeth's course on Kubernetes the Hard Way
+# Docs directory:
+# - https://github.com/mmumshad/kubernetes-the-hard-way/tree/master/docs
+
+# docs/04-certificate-authority.md
+- name: Provisioning a CA and Generating TLS Certificates
+  tags: certificates
+  hosts:
+    - kube_control_plane
+    - kube_nodes
+  gather_facts: true
+  tasks:
+    # Gather network facts from first control plane node
+    # This will read the hosts file and store next IPs for:
+    # [controlplane01, controlplane02, loadbalancer]
+    # Next, we will use these IPs to generate the certificates
+    # on the localhost at `{{ local_certs_path }}`
+    # and copy them to the respective nodes
+    - name: Provisioning a CA and Generating TLS Certificates
+      ansible.builtin.include_tasks: tasks/create_ca_and_tls.yml
+      tags: create_ca_and_tls
+
+    ##################################################################
+    # Distribute the Certificates to the Control Plane and Workers
+    ##################################################################
+    - name: Copy files to controlplane nodes
+      when: inventory_hostname in groups['kube_control_plane']
+      ansible.builtin.copy:
+        src: "{{ local_certs_path }}/{{ item }}"
+        dest: "~/"
+        mode: '0644'
+      with_items:
+        - ca.crt
+        - ca.key
+        - kube-apiserver.key
+        - kube-apiserver.crt
+        - apiserver-kubelet-client.crt
+        - apiserver-kubelet-client.key
+        - service-account.key
+        - service-account.crt
+        - etcd-server.key
+        - etcd-server.crt
+        - kube-controller-manager.key
+        - kube-controller-manager.crt
+        - kube-scheduler.key
+        - kube-scheduler.crt
+        - kube-proxy.key
+        - kube-proxy.crt
+        - admin.key
+        - admin.crt
+      tags: distribute_certs
+
+    - name: Copy files to worker nodes
+      when: inventory_hostname in groups['kube_nodes']
+      ansible.builtin.copy:
+        src: "{{ local_certs_path }}/{{ item }}"
+        dest: "~/"
+        mode: '0644'
+      with_items:
+        - ca.crt
+        - kube-proxy.crt
+        - kube-proxy.key
+      tags: distribute_certs
+
+# docs/03-client-tools.md
+- name: Installing the Client Tools
+  hosts: k8s_cluster
+  gather_facts: true
+  tasks:
+    - name: Install kubectl
+      ansible.builtin.include_tasks: tasks/install_kubectl.yml
+      tags: kubectl
+
+# docs/05-kubernetes-configuration-files.md
+- name: Generating Kubernetes Configuration Files for Authentication
+  tags: kubeconfig
+  hosts:
+    - kube_control_plane
+    - kube_nodes
+  gather_facts: false
+  tasks:
+    - name: Generating Kubernetes Configuration Files for Authentication
+      ansible.builtin.include_tasks: tasks/generate_kubeconfig.yml
+      tags: kubeconfig_gen
+
+    ##################################################################
+    # Copy the kubeconfig files to the respective nodes
+    ##################################################################
+    - name: Copy the appropriate kube-proxy kubeconfig files to each worker node
+      when: inventory_hostname in groups['kube_nodes']
+      ansible.builtin.copy:
+        src: "{{ local_certs_path }}/kube-proxy.kubeconfig"
+        dest: "~/"
+        mode: '0644'
+      tags: kubeconfig_copy
+
+    - name: Copy the appropriate kubeconfig files to each controller node
+      when: inventory_hostname in groups['kube_control_plane']
+      ansible.builtin.copy:
+        src: "{{ local_certs_path }}/{{ item }}.kubeconfig"
+        dest: "~/"
+        mode: '0644'
+      with_items:
+        - admin
+        - kube-controller-manager
+        - kube-scheduler
+      tags: kubeconfig_copy
+
+# docs/06-data-encryption-keys.md
+- name: Generating the Data Encryption Config w/Key & distribute on control plane
+  hosts: kube_control_plane
+  tags: encryption_config
+  gather_facts: false
+  tasks:
+    - name: Generating the Data Encryption Config and Key
+      ansible.builtin.include_tasks: tasks/generate_encryption_config.yml
+      tags: encryption
+
+# docs/07-bootstrapping-etcd.md
+- name: Bootstrapping the etcd Cluster
+  hosts: kube_control_plane
+  tags: etcd
+  gather_facts: false
+  tasks:
+    - name: Bootstrapping the etcd Cluster
+      ansible.builtin.include_tasks: tasks/bootstrap_etcd.yml
+      tags: etcd

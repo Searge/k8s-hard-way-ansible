@@ -1,0 +1,29 @@
+---
+- name: Generate and set encryption key
+  run_once: true
+  block:
+    - name: Generate the Data Encryption Key
+      delegate_to: localhost
+      ansible.builtin.shell:
+        cmd: set -o pipefail; head -c 32 /dev/urandom | base64
+      register: encryption_key
+
+    - name: Set encryption key
+      ansible.builtin.set_fact:
+        encryption_key: "{{ encryption_key.stdout }}"
+
+- name: Generate the Data Encryption Config
+  tags: encryption
+  become: true
+  block:
+    - name: Make remote directory for encryption config
+      ansible.builtin.file:
+        path: "{{ k8s_lib_dir }}"
+        state: directory
+        mode: '0755'
+
+    - name: Generate encryption config
+      ansible.builtin.template:
+        src: k8s/encryption-config.yaml.j2
+        dest: "{{ k8s_lib_dir }}/encryption-config.yaml"
+        mode: '0644'
