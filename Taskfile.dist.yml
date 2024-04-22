@@ -131,14 +131,14 @@ tasks:
 
   stop:
     cmds:
-      - vagrant halt --parallel
+      - vagrant halt
     desc: Stop Virtualbox VM
 
   destroy:
     dir: "{{.USER_WORKING_DIR}}"
     cmds:
       - vagrant destroy -f --parallel
-      - echo '' | known_hosts
+      - echo '' > known_hosts
     desc: Delete Virtualbox VM from disk
 
   status:
