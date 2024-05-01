@@ -72,7 +72,7 @@ pathspec==0.12.1
     #   ansible-lint
     #   black
     #   yamllint
-platformdirs==4.2.0
+platformdirs==4.2.1
     # via black
 pyasn1==0.6.0
     # via
