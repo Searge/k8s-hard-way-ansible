@@ -8,7 +8,7 @@ ansible-core==2.16.6
     #   ansible
     #   ansible-compat
     #   ansible-lint
-ansible-lint==24.2.2
+ansible-lint==24.2.3
 attrs==23.2.0
     # via
     #   jsonschema
