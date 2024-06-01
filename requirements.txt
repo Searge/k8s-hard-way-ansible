@@ -118,7 +118,7 @@ ruamel-yaml==0.18.6
     # via ansible-lint
 ruamel-yaml-clib==0.2.8
     # via ruamel-yaml
-ruff==0.4.2
+ruff==0.4.7
 six==1.16.0
     # via
     #   kubernetes
