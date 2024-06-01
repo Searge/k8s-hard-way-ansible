@@ -31,7 +31,7 @@ click==8.1.7
     # via black
 cryptography==42.0.6
     # via ansible-core
-docker==7.0.0
+docker==7.1.0
 filelock==3.14.0
     # via ansible-lint
 google-auth==2.29.0
