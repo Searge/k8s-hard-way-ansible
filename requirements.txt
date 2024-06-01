@@ -97,7 +97,7 @@ referencing==0.35.0
     # via
     #   jsonschema
     #   jsonschema-specifications
-requests==2.32.2
+requests==2.32.3
     # via
     #   docker
     #   kubernetes
