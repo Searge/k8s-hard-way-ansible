@@ -34,7 +34,7 @@ cryptography==42.0.8
 docker==7.1.0
 filelock==3.14.0
     # via ansible-lint
-google-auth==2.29.0
+google-auth==2.30.0
     # via kubernetes
 idna==3.7
     # via requests
